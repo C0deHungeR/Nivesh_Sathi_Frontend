@@ -25,23 +25,23 @@ export default function Navbar() {
     <header className="bg-green-100">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         {/* Logo */}
-        <div className="flex items-center gap-2 text-xl font-bold">
-          <Image
-            src="/logo.jpeg"
-            alt="NiveshSathi logo"
-            width={40}
-            height={40}
-            className="rounded-lg"
-          />
-          <span>NiveshSathi</span>
-        </div>
+        <Link href="/" className="flex items-center gap-2 text-xl font-bold">
+      <Image
+        src="/logo.jpeg"
+        alt="NiveshSathi logo"
+        width={40}
+        height={40}
+        className="rounded-lg"
+      />
+      <span>NiveshSathi</span>
+    </Link>
 
         {/* Links */}
         <div className="hidden md:flex gap-8 text-sm text-slate-600">
           <Link href="/fund-analytics">Fund Analytics</Link>
           <Link href="/ai-recommendation">AI Recommendations</Link>
           <Link href="/risk-simulator">Risk Simulator</Link>
-          <Link href="/learning-hub">How AI Works</Link>
+          <Link href="/learning-hub">Learning Hub</Link>
         </div>
 
         {/* Auth Area */}

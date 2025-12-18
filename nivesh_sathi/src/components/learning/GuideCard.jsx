@@ -33,6 +33,8 @@ export default function GuideCard({ icon, title, level, readTime, bullets, href 
       {href ? (
         <Link
           href={href}
+          target="_blank"
+          rel="noreferrer"
           className="mt-2 inline-flex items-center gap-1 self-start text-sm font-medium text-emerald-600 hover:text-emerald-700"
         >
           Read guide
