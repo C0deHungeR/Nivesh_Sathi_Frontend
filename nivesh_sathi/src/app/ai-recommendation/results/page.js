@@ -1,176 +1,120 @@
-// src/app/ai-recommendation/results/page.js
 "use client";
 
-import { useSearchParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
-const MOCK_FUNDS = [
-  {
-    id: 1,
-    name: "HDFC Top 100 Fund – Direct Growth",
-    amc: "HDFC AMC · Large Cap",
-    expectedReturn: "+12.2%",
-    riskTag: "High Risk",
-    match: "98%",
-  },
-  {
-    id: 2,
-    name: "SBI Small Cap Fund – Direct Growth",
-    amc: "SBI Mutual Fund · Small Cap",
-    expectedReturn: "+21.5%",
-    riskTag: "Very High Risk",
-    match: "97%",
-  },
-  {
-    id: 3,
-    name: "Mirae Asset Large Cap Fund – Direct Growth",
-    amc: "Mirae Asset AMC · Large Cap",
-    expectedReturn: "+14.7%",
-    riskTag: "High Risk",
-    match: "96%",
-  },
-  {
-    id: 4,
-    name: "ICICI Prudential Bluechip Fund – Direct Growth",
-    amc: "ICICI Prudential · Large Cap",
-    expectedReturn: "+11.8%",
-    riskTag: "Moderate Risk",
-    match: "95%",
-  },
-  {
-    id: 5,
-    name: "Axis Growth Opportunities Fund – Direct Growth",
-    amc: "Axis Mutual Fund · Large & Mid Cap",
-    expectedReturn: "+15.3%",
-    riskTag: "High Risk",
-    match: "94%",
-  },
-];
-
-export default function ResultsPage() {
-  const searchParams = useSearchParams();
+export default function AIResultsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const amount = searchParams.get("amount");
-  const tenure = searchParams.get("tenure");
-  const risk = searchParams.get("risk");
-  const fundCategory = searchParams.get("fundCategory");
-  const amcPreference = searchParams.get("amcPreference");
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const riskTextMap = {
-    "1": "conservative",
-    "2": "moderate",
-    "3": "aggressive",
-    "4": "very aggressive",
-  };
+  useEffect(() => {
+    const fundCategory = searchParams.get("fundCategory");
+    const amcPreference = searchParams.get("amcPreference");
+    const amount = searchParams.get("amount");
+    const tenure = searchParams.get("tenure");
 
-  const riskText = riskTextMap[risk] || "aggressive";
+    // Guard
+    if (!fundCategory || !amount || !tenure) {
+      router.replace("/ai-recommendation");
+      return;
+    }
 
-  const formatAmount = (val) => {
-    if (!val) return "";
-    const num = Number(val);
-    return `₹${(num / 100000).toFixed(1)}L`;
-  };
+    const fetchResults = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const res = await fetch("http://localhost:8080/api/ai/recommend", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            fundCategory,
+            amcPreference,
+            amount: Number(amount),
+            tenure: Number(tenure),
+          }),
+        });
+
+        if (!res.ok) throw new Error("AI service failed");
+
+        const data = await res.json();
+
+        // backend returns ONE object → wrap as array
+        setResults([data]);
+      } catch (err) {
+        console.error(err);
+        setError("Unable to fetch AI recommendations");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchResults();
+  }, [searchParams, router]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-500">Analyzing with AI…</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
+  }
 
   return (
-    <main className="min-h-screen bg-[#f5f7fb]">
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Top bar */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
-          <div>
-            <h1 className="text-xl md:text-2xl font-semibold text-[#102a43]">
-              Your AI Recommendations
-            </h1>
-            <p className="text-xs md:text-sm text-gray-500">
-              Based on {riskText} risk profile, {tenure} year tenure,{" "}
-              {formatAmount(amount)} investment
-              {fundCategory && fundCategory !== "All Categories"
-                ? `, ${fundCategory} funds`
-                : ""}{" "}
-              {amcPreference && amcPreference !== "Any AMC"
-                ? `· Preferred AMC: ${amcPreference}`
-                : ""}
-              .
-            </p>
-          </div>
+    <main className="min-h-screen bg-[#f5f7fb] px-4 py-10">
+      <div className="max-w-5xl mx-auto">
+        <h1 className="text-2xl font-semibold mb-6 text-[#102a43]">
+          AI Recommended Funds
+        </h1>
 
-          <button
-            onClick={() => router.push("/ai-recommendation")}
-            className="self-start md:self-auto px-4 py-2 rounded-full border border-[#0bb883] text-[#0bb883] text-xs font-semibold hover:bg-[#0bb883]/5 transition"
-          >
-            Modify Preferences
-          </button>
-        </div>
-
-        {/* List of cards */}
-        <div className="space-y-4">
-          {MOCK_FUNDS.map((fund) => (
+        <div className="grid gap-6">
+          {results.map((item, idx) => (
             <div
-              key={fund.id}
-              className="bg-white border border-[#0bb883]/40 rounded-2xl shadow-sm overflow-hidden"
+              key={idx}
+              className="bg-white rounded-xl p-6 shadow-sm border"
             >
-              {/* Top section */}
-              <div className="p-4 md:p-5 border-b border-gray-100 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                <div className="flex items-start gap-2">
-                  <span className="px-2 py-1 rounded-full bg-[#e6f8f0] text-[10px] font-semibold text-[#0bb883]">
-                    AI Recommended
-                  </span>
-                  <div>
-                    <h2 className="text-sm md:text-base font-semibold text-[#102a43]">
-                      {fund.name}
-                    </h2>
-                    <p className="text-[11px] text-gray-500">{fund.amc}</p>
-                  </div>
-                </div>
+              <h2 className="text-lg font-semibold mb-4">
+                {item.scheme_name}
+              </h2>
 
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <p className="text-[11px] text-gray-400">Match</p>
-                    <p className="text-sm font-semibold text-[#0bb883]">
-                      {fund.match}
-                    </p>
-                  </div>
-                </div>
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Past 1Y Return</span>
+                <span>{item.past_returns_1yr}%</span>
               </div>
 
-              {/* Middle info row */}
-              <div className="px-4 md:px-5 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-gray-400">Expected:</span>
-                  <span className="text-sm font-semibold text-[#0bb883]">
-                    {fund.expectedReturn}
-                  </span>
-                  <span className="px-2 py-0.5 rounded-full bg-[#ffe9e4] text-[10px] font-semibold text-[#ff8a4a]">
-                    {fund.riskTag}
-                  </span>
-                </div>
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Projected 1Y Return</span>
+                <span>{item.future_returns_1yr}%</span>
               </div>
 
-              {/* Why this fund + CTA */}
-              <div className="px-4 md:px-5 pb-4">
-                <div className="mb-3 rounded-xl bg-[#f5f7fb] p-3 flex gap-2">
-                  <div className="mt-1 h-5 w-5 rounded-full bg-white flex items-center justify-center text-[11px] font-bold text-[#f5b700]">
-                    ?
-                  </div>
-                  <div>
-                    <p className="text-[11px] font-semibold text-gray-600 mb-0.5">
-                      Why this fund?
-                    </p>
-                    <p className="text-[11px] text-gray-500">
-                      This fund shows excellent risk-adjusted returns and
-                      consistent market outperformance. Ideal for your selected
-                      investment horizon and risk profile.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center gap-3">
-                  <button className="flex-1 md:flex-none md:px-8 py-2 rounded-full bg-[#0bb883] text-white text-xs font-semibold shadow-md shadow-[#0bb883]/30 hover:bg-[#09a772] transition">
-                    View Fund
-                  </button>
-                  <button className="h-8 w-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 text-sm">
-                    ▾
-                  </button>
-                </div>
+              <div className="flex justify-between text-sm mt-3">
+                <span className="text-gray-600">Risk</span>
+                <span
+                  className={`font-semibold ${
+                    item.risk_level === "LOW"
+                      ? "text-green-600"
+                      : item.risk_level === "MID" ||
+                        item.risk_level === "Medium"
+                      ? "text-orange-500"
+                      : "text-red-600"
+                  }`}
+                >
+                  {item.risk_level}
+                </span>
               </div>
             </div>
           ))}

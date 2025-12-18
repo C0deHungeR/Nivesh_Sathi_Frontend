@@ -1,5 +1,6 @@
-import Navbar from "../components/navbar/Navbar";
-import "./globals.css"
+import "./globals.css";
+import NavbarWrapper from "../components/navbar/NavbarWrapper";
+
 export const metadata = {
   title: "NiveshSathi",
   description: "AI-powered wealth management for Indian middle-class investors",
@@ -8,8 +9,10 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <Navbar/>
-      <body>{children}</body>
+      <body>
+        <NavbarWrapper />
+        {children}
+      </body>
     </html>
   );
 }
