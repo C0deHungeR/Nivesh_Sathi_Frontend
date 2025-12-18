@@ -1,18 +1,21 @@
 // src/components/fund-analytics/FundCard.jsx
+import Link from "next/link";
 
 export default function FundCard({ fund, classNames }) {
+  const riskLabel = fund.risk_level || "Unknown";
+
   const riskColor =
-    fund.risk_level === "Very High"
+    riskLabel === "High"
       ? "bg-rose-50 text-rose-500"
-      : fund.risk_level === "High"
+      : riskLabel === "Medium"
       ? "bg-amber-50 text-amber-500"
-      : fund.risk_level === "Low"
+      : riskLabel === "Low"
       ? "bg-emerald-50 text-emerald-500"
       : "bg-slate-100 text-slate-500";
 
   return (
     <article className="flex h-full flex-col rounded-3xl bg-white p-5 shadow-sm border border-slate-100">
-      {/* Title + risk tag */}
+      {/* Title + risk */}
       <div className="mb-3 flex items-start justify-between gap-3">
         <div>
           <h2 className="text-base font-semibold text-slate-900 leading-snug">
@@ -26,11 +29,11 @@ export default function FundCard({ fund, classNames }) {
             riskColor
           )}
         >
-          {fund.risk_level}
+          {riskLabel}
         </span>
       </div>
 
-      {/* Category chips */}
+      {/* Categories */}
       <div className="mb-3 flex flex-wrap gap-2">
         {fund.category && (
           <span className="rounded-full bg-slate-100 px-3 py-1 text-[11px] text-slate-600">
@@ -56,12 +59,10 @@ export default function FundCard({ fund, classNames }) {
         <Metric label="Expense" value={fund.expense_ratio} />
         <Metric label="Fund size (Cr)" value={fund.fund_size_cr} />
         <Metric label="Sharpe" value={fund.sharpe} />
-        <Metric label="Sortino" value={fund.sortino} />
         <Metric label="Alpha" value={fund.alpha} />
-        <Metric label="Beta" value={fund.beta} />
       </div>
 
-      {/* Manager / rating */}
+      {/* Manager + rating */}
       <div className="mt-auto flex items-center justify-between text-[11px] text-slate-500">
         <span className="truncate">
           Manager:{" "}
@@ -76,9 +77,13 @@ export default function FundCard({ fund, classNames }) {
         )}
       </div>
 
-      <button className="mt-3 w-full rounded-2xl border border-slate-200 bg-slate-900/90 px-4 py-2 text-xs font-medium text-white hover:bg-slate-900">
+      {/* View details link */}
+      <Link
+        href={`/funds/${fund.id}`}
+        className="mt-3 block w-full rounded-2xl border border-slate-200 bg-slate-900/90 px-4 py-2 text-center text-xs font-medium text-white hover:bg-slate-900"
+      >
         View Details <span className="ml-1 text-[10px]">↗</span>
-      </button>
+      </Link>
     </article>
   );
 }
