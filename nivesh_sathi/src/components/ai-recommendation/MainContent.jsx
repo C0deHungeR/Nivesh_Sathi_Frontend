@@ -51,16 +51,16 @@ export default function MainContent() {
   };
 
   const handleSubmit = () => {
-    const params = new URLSearchParams({
-      amount: String(amount),
-      tenure: String(tenure),
-      risk: String(risk),
-      fundCategory,
-      amcPreference,
-    });
+  const params = new URLSearchParams({
+    amount: String(amount),
+    tenure: String(tenure),
+    fundCategory,
+    amcPreference,
+  });
 
-    router.push(`/ai-recommendation/results?${params.toString()}`); // 👈 go to results page [web:42][web:50]
-  };
+  router.push(`/ai-recommendation/results?${params.toString()}`);
+};
+
 
   return (
     <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
