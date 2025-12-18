@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Brain } from "lucide-react";
 
 export default function Navbar() {
   const [user, setUser] = useState(null);
@@ -23,9 +24,10 @@ export default function Navbar() {
         
         {/* Logo */}
         <div className="flex items-center gap-2 text-xl font-bold">
-          <span className="text-emerald-600">🧠</span>
+          <Brain className = "h-8 w-8 text-emerald-600"/>
           <span>WealthMind</span>
         </div>
+
 
         {/* Links */}
         <div className="hidden md:flex gap-8 text-sm text-slate-600">
