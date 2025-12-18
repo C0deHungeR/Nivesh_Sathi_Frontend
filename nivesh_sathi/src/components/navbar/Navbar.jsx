@@ -41,7 +41,7 @@ export default function Navbar() {
           <Link href="/fund-analytics">Fund Analytics</Link>
           <Link href="/ai-recommendation">AI Recommendations</Link>
           <Link href="/risk-simulator">Risk Simulator</Link>
-          <Link href="#">How AI Works</Link>
+          <Link href="/learning-hub">How AI Works</Link>
         </div>
 
         {/* Auth Area */}
