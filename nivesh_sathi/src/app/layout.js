@@ -1,7 +1,7 @@
 import Navbar from "../components/navbar/Navbar";
 import "./globals.css"
 export const metadata = {
-  title: "AI Mutual Fund Advisor",
+  title: "NiveshSathi",
   description: "AI-powered wealth management for Indian middle-class investors",
 };
 
