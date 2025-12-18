@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Brain } from "lucide-react";
+import Image from "next/image";
 
 export default function Navbar() {
   const [user, setUser] = useState(null);
@@ -19,15 +19,19 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="border-b bg-white/80 backdrop-blur">
+    <header className="bg-green-100">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-        
         {/* Logo */}
         <div className="flex items-center gap-2 text-xl font-bold">
-          <Brain className = "h-8 w-8 text-emerald-600"/>
-          <span>WealthMind</span>
+          <Image
+            src="/logo.jpeg"
+            alt="NiveshSathi logo"
+            width={40}
+            height={40}
+            className="rounded-lg"
+          />
+          <span>NiveshSathi</span>
         </div>
-
 
         {/* Links */}
         <div className="hidden md:flex gap-8 text-sm text-slate-600">

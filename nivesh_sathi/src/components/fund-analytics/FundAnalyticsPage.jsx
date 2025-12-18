@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import FundCard from "./FundCard.jsx";
+import { Search } from "lucide-react";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -118,7 +119,7 @@ export default function FundAnalyticsPage() {
       <div className="mb-6 grid gap-3 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)]">
         {/* Search */}
         <div className="flex items-center gap-2 rounded-full bg-white px-4 py-2 shadow-sm">
-          <span className="text-slate-400 text-lg">🔍</span>
+          <span className="text-slate-400 text-lg"><Search size={16} strokeWidth={2.25} /></span>
           <input
             type="text"
             placeholder="Search funds by name or AMC..."
