@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation"; // Add this import
+import { usePathname, useRouter } from "next/navigation";
 
 export default function Navbar() {
   const [user, setUser] = useState(null);
+  const [showMenu, setShowMenu] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -21,20 +22,28 @@ export default function Navbar() {
     }
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userName");
+    setUser(null);
+    setShowMenu(false);
+    router.push("/auth/login");
+  };
+
   return (
     <header className="bg-green-100">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 text-xl font-bold">
-      <Image
-        src="/logo.jpeg"
-        alt="NiveshSathi logo"
-        width={40}
-        height={40}
-        className="rounded-lg"
-      />
-      <span>NiveshSathi</span>
-    </Link>
+          <Image
+            src="/logo.jpeg"
+            alt="NiveshSathi logo"
+            width={40}
+            height={40}
+            className="rounded-lg"
+          />
+          <span>NiveshSathi</span>
+        </Link>
 
         {/* Links */}
         <div className="hidden md:flex gap-8 text-sm text-slate-600">
@@ -61,13 +70,30 @@ export default function Navbar() {
             </Link>
           </div>
         ) : (
-          <div className="flex items-center gap-3 cursor-pointer">
-            <div className="h-9 w-9 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold">
-              {user.name.charAt(0).toUpperCase()}
-            </div>
-            <span className="text-sm font-medium text-slate-700">
-              {user.name}
-            </span>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowMenu((v) => !v)}
+              className="flex items-center gap-3 cursor-pointer"
+            >
+              <div className="h-9 w-9 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold">
+                {user.name.charAt(0).toUpperCase()}
+              </div>
+              <span className="text-sm font-medium text-slate-700">
+                {user.name}
+              </span>
+            </button>
+
+            {showMenu && (
+              <div className="absolute right-0 mt-2 w-32 rounded-xl bg-white shadow-lg border border-slate-100 py-1 text-sm">
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-3 py-2 text-slate-700 hover:bg-slate-50"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
           </div>
         )}
       </nav>
