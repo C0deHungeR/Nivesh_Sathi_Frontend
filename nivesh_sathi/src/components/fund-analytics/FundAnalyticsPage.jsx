@@ -14,7 +14,12 @@ export default function FundAnalyticsPage() {
   const [funds, setFunds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
-  const [page, setPage] = useState(1); // 1-based page index
+  const [page, setPage] = useState(1);
+
+  // new filter states
+  const [selectedAmc, setSelectedAmc] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedRisk, setSelectedRisk] = useState("All");
 
   useEffect(() => {
     async function loadFunds() {
@@ -31,22 +36,60 @@ export default function FundAnalyticsPage() {
     loadFunds();
   }, []);
 
-  // Filter by search text
-  const filteredFunds = funds.filter((fund) => {
-    const q = query.trim().toLowerCase();
-    if (!q) return true;
-    const name = (fund.scheme_name || "").toLowerCase();
-    const amc = (fund.amc_name || "").toLowerCase();
-    return name.includes(q) || amc.includes(q);
-  });
+  // unique options for filters from data
+  const amcOptions = ["All", ...Array.from(new Set(funds.map((f) => f.amc_name)))];
+  const categoryOptions = [
+    "All",
+    ...Array.from(new Set(funds.map((f) => f.category))),
+  ];
+  const riskOptions = [
+    "All",
+    ...Array.from(new Set(funds.map((f) => f.risk_level))),
+  ];
 
-  // Reset to page 1 whenever search changes
   const handleSearchChange = (e) => {
     setQuery(e.target.value);
     setPage(1);
   };
 
-  // Pagination calculations
+  const handleAmcChange = (e) => {
+    setSelectedAmc(e.target.value);
+    setPage(1);
+  };
+
+  const handleCategoryChange = (e) => {
+    setSelectedCategory(e.target.value);
+    setPage(1);
+  };
+
+  const handleRiskChange = (e) => {
+    setSelectedRisk(e.target.value);
+    setPage(1);
+  };
+
+  // combined filtering: search + AMC + category + risk
+  const filteredFunds = funds.filter((fund) => {
+    const q = query.trim().toLowerCase();
+
+    if (q) {
+      const name = (fund.scheme_name || "").toLowerCase();
+      const amc = (fund.amc_name || "").toLowerCase();
+      if (!name.includes(q) && !amc.includes(q)) return false;
+    }
+
+    if (selectedAmc !== "All" && fund.amc_name !== selectedAmc) return false;
+    if (
+      selectedCategory !== "All" &&
+      (fund.category || "") !== selectedCategory
+    )
+      return false;
+    if (selectedRisk !== "All" && (fund.risk_level || "") !== selectedRisk)
+      return false;
+
+    return true;
+  });
+
+  // pagination
   const totalPages = Math.max(1, Math.ceil(filteredFunds.length / PAGE_SIZE));
   const startIndex = (page - 1) * PAGE_SIZE;
   const currentPageFunds = filteredFunds.slice(
@@ -71,8 +114,9 @@ export default function FundAnalyticsPage() {
         </p>
       </header>
 
-      {/* Filters */}
+      {/* Filters row */}
       <div className="mb-6 grid gap-3 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)]">
+        {/* Search */}
         <div className="flex items-center gap-2 rounded-full bg-white px-4 py-2 shadow-sm">
           <span className="text-slate-400 text-lg">🔍</span>
           <input
@@ -84,20 +128,44 @@ export default function FundAnalyticsPage() {
           />
         </div>
 
-        <button className="flex items-center justify-between rounded-full bg-white px-4 py-2 text-sm text-slate-700 shadow-sm">
-          <span>All AMCs</span>
-          <span className="text-slate-400 text-xs">▼</span>
-        </button>
+        {/* AMC filter */}
+        <select
+          value={selectedAmc}
+          onChange={handleAmcChange}
+          className="rounded-full bg-white px-4 py-2 text-sm text-slate-700 shadow-sm border border-slate-200"
+        >
+          {amcOptions.map((amc) => (
+            <option key={amc} value={amc}>
+              {amc}
+            </option>
+          ))}
+        </select>
 
-        <button className="flex items-center justify-between rounded-full bg-white px-4 py-2 text-sm text-slate-700 shadow-sm">
-          <span>All Categories</span>
-          <span className="text-slate-400 text-xs">▼</span>
-        </button>
+        {/* Category filter */}
+        <select
+          value={selectedCategory}
+          onChange={handleCategoryChange}
+          className="rounded-full bg-white px-4 py-2 text-sm text-slate-700 shadow-sm border border-slate-200"
+        >
+          {categoryOptions.map((c) => (
+            <option key={c || "none"} value={c}>
+              {c || "Uncategorised"}
+            </option>
+          ))}
+        </select>
 
-        <button className="flex items-center justify-between rounded-full bg-white px-4 py-2 text-sm text-slate-700 shadow-sm">
-          <span>All Risk</span>
-          <span className="text-slate-400 text-xs">▼</span>
-        </button>
+        {/* Risk filter */}
+        <select
+          value={selectedRisk}
+          onChange={handleRiskChange}
+          className="rounded-full bg-white px-4 py-2 text-sm text-slate-700 shadow-sm border border-slate-200"
+        >
+          {riskOptions.map((r) => (
+            <option key={r || "none"} value={r}>
+              {r || "Unknown risk"}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Count */}
@@ -131,7 +199,7 @@ export default function FundAnalyticsPage() {
         </div>
       )}
 
-      {/* Pagination controls */}
+      {/* Pagination */}
       {!loading && totalPages > 1 && (
         <div className="mt-8 flex items-center justify-center gap-2 text-sm">
           <button

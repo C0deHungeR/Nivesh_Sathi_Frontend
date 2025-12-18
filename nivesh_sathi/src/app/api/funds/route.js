@@ -4,9 +4,24 @@ import fs from "fs";
 import path from "path";
 import Papa from "papaparse";
 
+const slugify = (name = "", index) =>
+  name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "") || `fund-${index}`;
+
+// numeric → text risk
+const toRiskLevel = (num) => {
+  const n = Number(num);
+  if (Number.isNaN(n)) return "Unknown";
+  if (n <= 2) return "Low";
+  if (n <= 4) return "Medium";
+  return "High";
+};
+
 export async function GET() {
   try {
-    const csvPath = path.join(process.cwd(), "data", "funds.csv"); // MF_India_AI.csv renamed
+    const csvPath = path.join(process.cwd(), "data", "funds.csv");
     const file = fs.readFileSync(csvPath, "utf8");
 
     const parsed = Papa.parse(file, {
@@ -15,7 +30,7 @@ export async function GET() {
     });
 
     const records = parsed.data.map((row, index) => ({
-      id: row.scheme_name || `fund-${index}`,
+      id: slugify(row.scheme_name, index),
       scheme_name: row.scheme_name,
       min_sip: row.min_sip,
       min_lumpsum: row.min_lumpsum,
@@ -28,7 +43,11 @@ export async function GET() {
       sd: row.sd,
       beta: row.beta,
       sharpe: row.sharpe,
-      risk_level: row.risk_level,
+
+      // keep numeric and add textual level
+      risk_numeric: row.risk_level,
+      risk_level: toRiskLevel(row.risk_level),
+
       amc_name: row.amc_name,
       rating: row.rating,
       category: row.category,
