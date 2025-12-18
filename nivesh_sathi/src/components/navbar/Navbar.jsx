@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation"; // Add this import
 
 export default function Navbar() {
   const [user, setUser] = useState(null);
@@ -20,23 +21,19 @@ export default function Navbar() {
     }
   }, []);
 
-
-
-  
-
   return (
-    <header className="border-b bg-white/80 backdrop-blur">
+    <header className="bg-green-100">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-        {/* Left: nav controls + logo */}
-        <div className="flex items-center gap-4">
-          {/* Back button */}
-          
-
-          {/* Logo */}
-          <div className="flex items-center gap-2 text-xl font-bold ml-2">
-            <span className="text-emerald-600">🧠</span>
-            <span>WealthMind</span>
-          </div>
+        {/* Logo */}
+        <div className="flex items-center gap-2 text-xl font-bold">
+          <Image
+            src="/logo.jpeg"
+            alt="NiveshSathi logo"
+            width={40}
+            height={40}
+            className="rounded-lg"
+          />
+          <span>NiveshSathi</span>
         </div>
 
         {/* Links */}
@@ -56,7 +53,6 @@ export default function Navbar() {
             >
               Log in
             </Link>
-
             <Link
               href="/auth/signup"
               className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg font-medium text-sm"

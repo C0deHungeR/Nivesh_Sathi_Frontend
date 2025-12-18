@@ -1,6 +1,6 @@
 // src/components/fund-analytics/FundCard.jsx
 import Link from "next/link";
-
+import { MoveUpRight } from "lucide-react";
 export default function FundCard({ fund, classNames }) {
   const riskLabel = fund.risk_level || "Unknown";
 
@@ -80,9 +80,10 @@ export default function FundCard({ fund, classNames }) {
       {/* View details link */}
       <Link
         href={`/funds/${fund.id}`}
-        className="mt-3 block w-full rounded-2xl border border-slate-200 bg-slate-900 px-4 py-2 text-center text-xs font-medium text-white hover:bg-slate-900"
+        className=" flex mt-3 block w-full rounded-2xl border border-slate-200 bg-slate-900/90 px-26 py-2 text-center text-xs font-medium text-white hover:bg-slate-900"
       >
-        View Details <span className="ml-1 text-[10px]">↗</span>
+        View Details <MoveUpRight size={20} color="#009966" strokeWidth={2.25} />
+
       </Link>
     </article>
   );

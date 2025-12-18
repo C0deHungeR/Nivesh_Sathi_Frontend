@@ -1,18 +1,17 @@
-// src/app/funds/[id]/page.jsx
 "use client";
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
-// small SVG line+area chart for 1Y/3Y/5Y returns
+// SVG Performance Chart with X and Y axis scales
 function PerformanceChart({ fund }) {
   if (!fund) return null;
 
- const data = [
-  { label: "5Y", value: Number(fund.returns_5yr) || 0 },
-  { label: "3Y", value: Number(fund.returns_3yr) || 0 },
-  { label: "1Y", value: Number(fund.returns_1yr) || 0 },
-];
+  const data = [
+    { label: "5Y", value: Number(fund.returns_5yr) || 0 },
+    { label: "3Y", value: Number(fund.returns_3yr) || 0 },
+    { label: "1Y", value: Number(fund.returns_1yr) || 0 },
+  ];
 
   const width = 800;
   const height = 220;
@@ -39,6 +38,13 @@ function PerformanceChart({ fund }) {
     ` L ${xScale(data.length - 1)} ${height - paddingY}` +
     ` L ${xScale(0)} ${height - paddingY} Z`;
 
+  // Generate Y-axis ticks
+  const numTicks = 5;
+  const ticks = Array.from({ length: numTicks }, (_, i) => {
+    const value = min + (i / (numTicks - 1)) * (max - min);
+    return { value, y: yScale(value) };
+  });
+
   return (
     <div className="mt-4 rounded-3xl bg-emerald-50/60 p-4">
       <h3 className="mb-3 text-sm font-semibold text-slate-800">
@@ -49,9 +55,67 @@ function PerformanceChart({ fund }) {
         className="w-full h-60"
         aria-hidden="true"
       >
+        {/* Y-axis */}
+        <line
+          x1={paddingX}
+          y1={paddingY}
+          x2={paddingX}
+          y2={height - paddingY}
+          stroke="currentColor"
+          strokeWidth="1"
+          opacity="0.5"
+        />
+        {/* Y-axis ticks and labels */}
+        {ticks.map((tick) => (
+          <g key={tick.value}>
+            <line
+              x1={paddingX - 4}
+              y1={tick.y}
+              x2={paddingX}
+              y2={tick.y}
+              stroke="currentColor"
+              strokeWidth="1"
+              opacity="0.5"
+            />
+            <text
+              x={paddingX - 8}
+              y={tick.y + 4}
+              textAnchor="end"
+              className="fill-slate-500 text-[10px]"
+            >
+              {tick.value.toFixed(1)}%
+            </text>
+          </g>
+        ))}
+
+        {/* X-axis */}
+        <line
+          x1={paddingX}
+          y1={height - paddingY}
+          x2={width - paddingX}
+          y2={height - paddingY}
+          stroke="currentColor"
+          strokeWidth="1"
+          opacity="0.5"
+        />
+        {/* X-axis labels */}
+        {data.map((d, i) => (
+          <text
+            key={d.label}
+            x={xScale(i)}
+            y={height - 4}
+            textAnchor="middle"
+            className="fill-slate-500 text-[10px]"
+          >
+            {d.label}
+          </text>
+        ))}
+
+        {/* Area and line */}
         <path d={areaD} className="fill-emerald-200/60" />
         <path d={pathD} className="stroke-emerald-600 stroke-[3]" fill="none" />
 
+        {/* Data points */}
         {data.map((d, i) => (
           <g key={d.label}>
             <circle
@@ -60,14 +124,6 @@ function PerformanceChart({ fund }) {
               r="4"
               className="fill-emerald-600"
             />
-            <text
-              x={xScale(i)}
-              y={height - 4}
-              textAnchor="middle"
-              className="fill-slate-400 text-[10px]"
-            >
-              {d.label}
-            </text>
           </g>
         ))}
       </svg>
@@ -75,6 +131,38 @@ function PerformanceChart({ fund }) {
   );
 }
 
+// Tile for displaying return values
+function ReturnTile({ label, value }) {
+  const display =
+    value === null || value === undefined || value === ""
+      ? "—"
+      : value.toString().includes("%")
+      ? value
+      : `${value}%`;
+
+  return (
+    <div className="rounded-2xl bg-slate-50 px-4 py-3 text-center">
+      <p className="text-xs text-slate-500">{label}</p>
+      <p className="mt-1 text-xl font-semibold text-emerald-600">
+        {display}
+      </p>
+    </div>
+  );
+}
+
+// Row for displaying fund details
+function DetailRow({ label, value }) {
+  return (
+    <p className="flex justify-between text-xs text-slate-600">
+      <span>{label}</span>
+      <span className="font-semibold text-slate-900">
+        {value || "—"}
+      </span>
+    </p>
+  );
+}
+
+// Main Fund Details Page
 export default function FundDetailsPage() {
   const { id } = useParams();
   const [fund, setFund] = useState(null);
@@ -120,7 +208,7 @@ export default function FundDetailsPage() {
     );
   }
 
-  // simple descriptive analysis
+  // Descriptive analysis
   const returns = [
     Number(fund.returns_1yr) || 0,
     Number(fund.returns_3yr) || 0,
@@ -212,35 +300,5 @@ export default function FundDetailsPage() {
         </div>
       </div>
     </main>
-  );
-}
-
-
-function ReturnTile({ label, value }) {
-  const display =
-    value === null || value === undefined || value === ""
-      ? "—"
-      : value.toString().includes("%")
-      ? value
-      : `${value}%`;
-
-  return (
-    <div className="rounded-2xl bg-slate-50 px-4 py-3 text-center">
-      <p className="text-xs text-slate-500">{label}</p>
-      <p className="mt-1 text-xl font-semibold text-emerald-600">
-        {display}
-      </p>
-    </div>
-  );
-}
-
-function DetailRow({ label, value }) {
-  return (
-    <p className="flex justify-between text-xs text-slate-600">
-      <span>{label}</span>
-      <span className="font-semibold text-slate-900">
-        {value || "—"}
-      </span>
-    </p>
   );
 }
