@@ -2,9 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function Navbar() {
   const [user, setUser] = useState(null);
+  const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -17,14 +20,23 @@ export default function Navbar() {
     }
   }, []);
 
+
+
+  
+
   return (
     <header className="border-b bg-white/80 backdrop-blur">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-        
-        {/* Logo */}
-        <div className="flex items-center gap-2 text-xl font-bold">
-          <span className="text-emerald-600">🧠</span>
-          <span>WealthMind</span>
+        {/* Left: nav controls + logo */}
+        <div className="flex items-center gap-4">
+          {/* Back button */}
+          
+
+          {/* Logo */}
+          <div className="flex items-center gap-2 text-xl font-bold ml-2">
+            <span className="text-emerald-600">🧠</span>
+            <span>WealthMind</span>
+          </div>
         </div>
 
         {/* Links */}
@@ -37,7 +49,6 @@ export default function Navbar() {
 
         {/* Auth Area */}
         {!user ? (
-          // 🔓 Logged OUT
           <div className="flex items-center gap-4">
             <Link
               href="/auth/login"
@@ -54,7 +65,6 @@ export default function Navbar() {
             </Link>
           </div>
         ) : (
-          // 🔐 Logged IN
           <div className="flex items-center gap-3 cursor-pointer">
             <div className="h-9 w-9 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold">
               {user.name.charAt(0).toUpperCase()}
