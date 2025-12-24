@@ -10,18 +10,21 @@ export default function Navbar() {
   const [showMenu, setShowMenu] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-  const menuRef = useRef(null); // profile + dropdown wrapper
+  const menuRef = useRef(null);
 
+  // Load auth info from localStorage (full name)
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const token = localStorage.getItem("token");
-    const name = localStorage.getItem("userName");
+    const name = localStorage.getItem("userName"); // should be full name from login
 
     if (token && name) {
       setUser({ name });
     } else {
       setUser(null);
     }
-  }, []);
+  }, [pathname]);
 
   // Close menu when clicking anywhere outside
   useEffect(() => {
@@ -33,7 +36,8 @@ export default function Navbar() {
     if (showMenu) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, [showMenu]);
 
   const handleLogout = () => {
@@ -43,6 +47,16 @@ export default function Navbar() {
     setShowMenu(false);
     router.push("/auth/login");
   };
+
+  const handleProfile = () => {
+    setShowMenu(false);
+    router.push("/profile"); // create this page later
+  };
+
+  const initial =
+    user?.name && user.name.length > 0
+      ? user.name.charAt(0).toUpperCase()
+      : "U";
 
   return (
     <header className="bg-green-100">
@@ -91,16 +105,29 @@ export default function Navbar() {
               onClick={() => setShowMenu((v) => !v)}
               className="flex items-center gap-3 cursor-pointer rounded-full px-2 py-1 hover:bg-emerald-100 transition"
             >
+              {/* Avatar with first letter */}
               <div className="h-9 w-9 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold">
-                {user.name.charAt(0).toUpperCase()}
+                {initial}
               </div>
-              <span className="text-sm font-medium text-slate-700">
+              <span className="text-sm font-medium text-slate-700 max-w-[140px] truncate">
                 {user.name}
               </span>
             </button>
 
             {showMenu && (
-              <div className="absolute right-0 mt-2 w-40 rounded-xl bg-white shadow-lg border border-slate-100 py-1 text-sm z-20">
+              <div className="absolute right-0 mt-2 w-44 rounded-xl bg-white shadow-lg border border-slate-100 py-1 text-sm z-20">
+                <button
+                  onClick={handleProfile}
+                  className="flex w-full items-center gap-2 px-3 py-2 text-slate-700 hover:bg-slate-50 rounded-lg transition"
+                >
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold">
+                    {initial}
+                  </span>
+                  <span>Profile</span>
+                </button>
+
+                <div className="my-1 h-px bg-slate-100" />
+
                 <button
                   onClick={handleLogout}
                   className="flex w-full items-center gap-2 px-3 py-2 text-slate-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition"
