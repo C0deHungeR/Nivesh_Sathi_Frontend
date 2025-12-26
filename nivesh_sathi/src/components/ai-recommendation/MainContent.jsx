@@ -101,17 +101,16 @@ export default function MainContent() {
       }
 
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/ai/recommend`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+      const res = await fetch(`${BACKEND_URL}/ai/recommend`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
 
 
       if (!res.ok) {
