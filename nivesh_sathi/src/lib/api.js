@@ -1,5 +1,6 @@
-const BASE_URL = "http://localhost:8080/api";
+import { BASE_URL } from "../lib/config";
 
+// Signup
 export async function signup(data) {
   const res = await fetch(`${BASE_URL}/auth/signup`, {
     method: "POST",
@@ -13,9 +14,10 @@ export async function signup(data) {
     throw new Error("Signup failed");
   }
 
-  return res.json();
+  return res.json(); // signup usually returns JSON
 }
 
+// Login (backend returns plain text token)
 export async function login(data) {
   const res = await fetch(`${BASE_URL}/auth/login`, {
     method: "POST",
@@ -29,5 +31,5 @@ export async function login(data) {
     throw new Error("Login failed");
   }
 
-  return res.text(); // JWT token
+  return res.text(); // ✅ plain JWT string
 }

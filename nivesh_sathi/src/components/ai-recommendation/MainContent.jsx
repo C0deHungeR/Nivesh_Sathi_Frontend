@@ -1,7 +1,10 @@
+
 "use client";
+
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+
 
 const fundCategories = [
   "All Categories",
@@ -11,6 +14,7 @@ const fundCategories = [
   "Hybrid",
   "Debt",
 ];
+
 
 const amcOptions = [
   "Aditya Birla Sun Life Mutual Fund",
@@ -48,8 +52,10 @@ const amcOptions = [
   "WhiteOak Capital Mutual Fund"
 ];
 
+
 export default function MainContent() {
   const router = useRouter();
+
 
   const [mode, setMode] = useState("LUMPSUM");
   const [amount, setAmount] = useState(100000);
@@ -57,15 +63,19 @@ export default function MainContent() {
   const [tenure, setTenure] = useState(5);
   const [risk, setRisk] = useState(3);
 
+
   const [fundCategory, setFundCategory] = useState("All Categories");
   const [amcPreference, setAmcPreference] = useState("Any AMC");
+
 
   const formatAmountLabel = (v) => `₹${(v / 100000).toFixed(1)}L`;
   const formatSipLabel = (v) => `₹${v.toLocaleString()}`;
 
+
   // helpers to compute thumb position (0–100%)
   const calcPercent = (value, min, max) =>
     ((value - min) / (max - min || 1)) * 100;
+
 
   const handleSubmit = async () => {
     try {
@@ -78,15 +88,23 @@ export default function MainContent() {
         tenure: tenure,
       };
 
+
       console.log("SENDING PAYLOAD:", payload);
 
-      const res = await fetch("http://localhost:8080/api/ai/recommend", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+
+      const token = localStorage.getItem("token");
+
+const res = await fetch("/api/ai/recommend", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  },
+  body: JSON.stringify(payload),
+});
+
+
+
 
       if (!res.ok) {
         const text = await res.text();
@@ -94,19 +112,23 @@ export default function MainContent() {
         return;
       }
 
+
       const data = await res.json();
       console.log("AI RESPONSE:", data);
+
 
       sessionStorage.setItem(
         "aiResults",
         JSON.stringify(data.recommendations)
       );
 
+
       router.push("/ai-recommendation/results");
     } catch (err) {
       console.error("Request failed:", err);
     }
   };
+
 
   return (
     <section className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-slate-100">
@@ -132,6 +154,7 @@ export default function MainContent() {
           </div>
         </div>
 
+
         <div className="flex flex-col">
           <label className="text-xs font-medium text-slate-500 mb-1">
             AMC Preference
@@ -152,6 +175,7 @@ export default function MainContent() {
           </div>
         </div>
       </div>
+
 
       {/* Mode toggle */}
       <div className="flex items-center justify-between mb-6">
@@ -175,6 +199,7 @@ export default function MainContent() {
         </div>
       </div>
 
+
       {/* Lumpsum */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-1">
@@ -185,6 +210,7 @@ export default function MainContent() {
             {formatAmountLabel(amount)}
           </span>
         </div>
+
 
         {/* slider + bubble */}
         <div className="relative mt-4">
@@ -197,6 +223,7 @@ export default function MainContent() {
           >
             {formatAmountLabel(amount)}
           </div>
+
 
           <input
             type="range"
@@ -212,11 +239,13 @@ export default function MainContent() {
           />
         </div>
 
+
         <div className="flex justify-between text-[11px] text-slate-400 mt-1">
           <span>₹10k</span>
           <span>₹20L</span>
         </div>
       </div>
+
 
       {/* SIP */}
       <div className="mb-6">
@@ -229,6 +258,7 @@ export default function MainContent() {
           </span>
         </div>
 
+
         <div className="relative mt-4">
           <div
             className="absolute -top-6 -translate-x-1/2 px-2 py-0.5 rounded-full bg-emerald-500 text-[11px] text-white font-medium shadow-sm"
@@ -238,6 +268,7 @@ export default function MainContent() {
           >
             {formatSipLabel(sipAmount)}
           </div>
+
 
           <input
             type="range"
@@ -253,11 +284,13 @@ export default function MainContent() {
           />
         </div>
 
+
         <div className="flex justify-between text-[11px] text-slate-400 mt-1">
           <span>₹500</span>
           <span>₹50k</span>
         </div>
       </div>
+
 
       {/* Tenure + Risk */}
       <div className="grid md:grid-cols-2 gap-5 mb-7">
@@ -284,6 +317,7 @@ export default function MainContent() {
           </div>
         </div>
 
+
         <div>
           <div className="flex items-center justify-between mb-1">
             <label className="text-xs font-medium text-slate-600">
@@ -309,6 +343,7 @@ export default function MainContent() {
         </div>
       </div>
 
+
       {/* CTA */}
       <button
         onClick={handleSubmit}
@@ -316,6 +351,7 @@ export default function MainContent() {
       >
         Get AI Recommendations
       </button>
+
 
       <p className="mt-3 text-[11px] text-center text-slate-400">
         Uses historical performance, risk metrics, and your profile to rank
