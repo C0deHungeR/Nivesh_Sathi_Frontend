@@ -23,6 +23,7 @@ This repository contains the frontend of the application.
   
 
 ✨ Key Features
+
     🔐 User Authentication (Signup / Login)
     🤖 AI-powered mutual fund recommendations
     📈 Lumpsum & SIP investment analysis
@@ -31,6 +32,7 @@ This repository contains the frontend of the application.
     🔗 Secure backend & ML service integration
 
 🛠️ Tech Stack
+
       Framework: Next.js (App Router)
       Language: JavaScript (React)
       Styling: Tailwind CSS
@@ -39,6 +41,7 @@ This repository contains the frontend of the application.
       Deployment: Vercel
 
   📂 Project Structure
+  
         src/
       ├── app/
       │   ├── api/
@@ -55,6 +58,7 @@ This repository contains the frontend of the application.
       └── styles/
 
 🔑 Environment Variables
+
     # AI (server-side only)
     GROQ_API_KEY=your_groq_api_key
     GROQ_MODEL=llama-3.3-70b-versatile
@@ -62,12 +66,14 @@ This repository contains the frontend of the application.
     NEXT_PUBLIC_BACKEND_URL=https://nivesh-sathi-backend.onrender.com/api
 
 🔐 Authentication Flow (Frontend)
+
     User signs up or logs in
     Backend returns a plain JWT token
     Token is stored in localStorage
     Authenticated requests include:
 
 🤖 AI Recommendation Flow
+
     User Input
        ↓
     Frontend (Next.js)
@@ -79,6 +85,7 @@ This repository contains the frontend of the application.
     AI Recommendations
 
 🌍 Live Deployment
+
     The frontend is deployed and live on Vercel:
     👉 https://nivesh-sathi-frontend.vercel.app/
     Backend and ML services are deployed separately.
