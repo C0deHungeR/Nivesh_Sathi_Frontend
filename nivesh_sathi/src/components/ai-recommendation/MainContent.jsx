@@ -93,17 +93,25 @@ export default function MainContent() {
 
 
       const token = localStorage.getItem("token");
-
-const res = await fetch("/api/ai/recommend", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`,
-  },
-  body: JSON.stringify(payload),
-});
+      
+      if (!token) {
+        alert("Please login first");
+        router.push("/auth/login");
+        return;
+      }
 
 
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/ai/recommend`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
 
 
       if (!res.ok) {
